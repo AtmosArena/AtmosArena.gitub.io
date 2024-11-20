@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      background: #f9fafb;
+      color: #111827;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 1.5rem;
+      margin: 0;
+      background: #f3f4f6;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    h4 {
+      font-size: 1.0rem;
+      font-weight: 600;
+      padding: 1.5rem;
+      margin: 0;
+      background: #f3f4f6;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .section {
+      margin: 1.5rem;
+      background: white;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .section-header {
+      padding: 1rem 1.5rem;
+      font-weight: 600;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 0.75rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .metric {
+      font-family: monospace;
+      color: #4b5563;
+    }
+    
+    .best {
+      color: #059669;
+      font-weight: 600;
+    }
+    
+    .model-name {
+      font-weight: 500;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 0 1rem;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .tab.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    .section:has(.tab[onclick*="switchTab"]) table {
+      font-size: 0.9rem;
+    }
+    .section:has(.tab[onclick*="switchTab"]) th,
+    .section:has(.tab[onclick*="switchTab"]) td {
+      padding: 0.5rem 0.75rem;
+    }
+
+    th.sortable {
+      cursor: pointer;
+      position: relative;
+      padding-right: 1.5rem !important;
+    }
+    
+    th.sortable:after {
+      content: '↕️';
+      position: absolute;
+      right: 0.5rem;
+      opacity: 0.3;
+    }
+    
+    th.sortable.sort-asc:after {
+      content: '↑';
+      opacity: 1;
+    }
+    
+    th.sortable.sort-desc:after {
+      content: '↓';
+      opacity: 1;
+    }
+    
+    th.sortable:hover {
+      background: #f0f1f3;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><b>AtmosArena</b> Performance Leaderboard ⛅</h1>
+    <h4>To submit a model to the AtmosArena Leaderboard, please contact <a href="mailto:atmosarena@gmail.com">atmosarena@gmail.com</a> 🌞</h4>
+<!-- 
+    <div class="section">
+      <div class="section-header">S2S Forecasting</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('weeks34')">Weeks 3-4</div>
+        <div class="tab" onclick="switchTab('weeks56')">Weeks 5-6</div>
+      </div>
+      
+      <div id="weeks34" class="tab-content active">
+        <table>
+          <tr>
+            <th>Model</th>
+            <th>Z500 (RMSE ↓)</th>
+            <th>T850 (RMSE ↓)</th>
+            <th>T2m (RMSE ↓)</th>
+            <th>Q700 (RMSE ↓)</th>
+            <th>Z500 (ACC ↑)</th>
+            <th>T850 (ACC ↑)</th>
+            <th>T2m (ACC ↑)</th>
+            <th>Q700 (ACC ↑)</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric best">453.05</td>
+            <td class="metric best">1.77</td>
+            <td class="metric">1.65</td>
+            <td class="metric best">0.69</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0.92</td>
+            <td class="metric">0.95</td>
+            <td class="metric best">0.86</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric">458.53</td>
+            <td class="metric">1.79</td>
+            <td class="metric">1.67</td>
+            <td class="metric best">0.69</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0.92</td>
+            <td class="metric">0.96</td>
+            <td class="metric best">0.86</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric">461.19</td>
+            <td class="metric best">1.77</td>
+            <td class="metric best">1.56</td>
+            <td class="metric">0.70</td>
+            <td class="metric">0.78</td>
+            <td class="metric">0.88</td>
+            <td class="metric">0.95</td>
+            <td class="metric">0.81</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">466.82</td>
+            <td class="metric">1.79</td>
+            <td class="metric">1.64</td>
+            <td class="metric">0.71</td>
+            <td class="metric">0.77</td>
+            <td class="metric">0.87</td>
+            <td class="metric">0.94</td>
+            <td class="metric">0.82</td>
+          </tr>
+          <tr>
+            <td class="model-name">Unet</td>
+            <td class="metric">498.46</td>
+            <td class="metric">1.90</td>
+            <td class="metric">1.63</td>
+            <td class="metric">0.74</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0.92</td>
+            <td class="metric best">0.97</td>
+            <td class="metric">0.85</td>
+          </tr>
+          <tr>
+            <td class="model-name">Climatology</td>
+            <td class="metric">475.58</td>
+            <td class="metric">2.00</td>
+            <td class="metric">1.61</td>
+            <td class="metric">0.76</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div id="weeks56" class="tab-content">
+        <table>
+          <tr>
+            <th>Model</th>
+            <th>Z500 (RMSE ↓)</th>
+            <th>T850 (RMSE ↓)</th>
+            <th>T2m (RMSE ↓)</th>
+            <th>Q700 (RMSE ↓)</th>
+            <th>Z500 (ACC ↑)</th>
+            <th>T850 (ACC ↑)</th>
+            <th>T2m (ACC ↑)</th>
+            <th>Q700 (ACC ↑)</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric">469.92</td>
+            <td class="metric best">1.80</td>
+            <td class="metric">1.70</td>
+            <td class="metric">0.71</td>
+            <td class="metric">0.81</td>
+            <td class="metric">0.90</td>
+            <td class="metric">0.94</td>
+            <td class="metric">0.84</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric">471.58</td>
+            <td class="metric">1.84</td>
+            <td class="metric">1.73</td>
+            <td class="metric best">0.70</td>
+            <td class="metric">0.81</td>
+            <td class="metric">0.90</td>
+            <td class="metric best">0.95</td>
+            <td class="metric">0.84</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric best">467.37</td>
+            <td class="metric">1.81</td>
+            <td class="metric">1.69</td>
+            <td class="metric">0.72</td>
+            <td class="metric">0.77</td>
+            <td class="metric">0.87</td>
+            <td class="metric">0.94</td>
+            <td class="metric">0.81</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">475.06</td>
+            <td class="metric">1.84</td>
+            <td class="metric">1.75</td>
+            <td class="metric">0.72</td>
+            <td class="metric">0.77</td>
+            <td class="metric">0.87</td>
+            <td class="metric">0.93</td>
+            <td class="metric">0.82</td>
+          </tr>
+          <tr>
+            <td class="model-name">Unet</td>
+            <td class="metric">521.32</td>
+            <td class="metric">2.09</td>
+            <td class="metric">2.29</td>
+            <td class="metric">0.75</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0.91</td>
+            <td class="metric">0.93</td>
+            <td class="metric best">0.85</td>
+          </tr>
+          <tr>
+            <td class="model-name">Climatology</td>
+            <td class="metric">475.58</td>
+            <td class="metric">2.00</td>
+            <td class="metric best">1.61</td>
+            <td class="metric">0.76</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+          </tr>
+        </table>
+      </div>
+    </div> -->
+
+    <div class="section">
+      <div class="section-header">S2S Forecasting</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('weeks34')">Weeks 3-4</div>
+        <div class="tab" onclick="switchTab('weeks56')">Weeks 5-6</div>
+      </div>
+      
+      <div id="weeks34" class="tab-content active">
+        <table>
+          <tr>
+            <th rowspan="2">Model</th>
+            <th colspan="3">Z500</th>
+            <th colspan="3">T850</th>
+            <th colspan="3">T2m</th>
+            <th colspan="3">Q700</th>
+          </tr>
+          <tr>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric">458.53</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0</td>
+            <td class="metric">1.79</td>
+            <td class="metric best">0.92</td>
+            <td class="metric best">0.3153</td>
+            <td class="metric">1.67</td>
+            <td class="metric">0.96</td>
+            <td class="metric best">0.1671</td>
+            <td class="metric best">0.69</td>
+            <td class="metric best">0.86</td>
+            <td class="metric best">0.0789</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric best">453.05</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0</td>
+            <td class="metric best">1.77</td>
+            <td class="metric best">0.92</td>
+            <td class="metric">0.3224</td>
+            <td class="metric">1.65</td>
+            <td class="metric">0.95</td>
+            <td class="metric">0.2298</td>
+            <td class="metric best">0.69</td>
+            <td class="metric best">0.86</td>
+            <td class="metric">0.0930</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric">461.19</td>
+            <td class="metric">0.78</td>
+            <td class="metric best">0</td>
+            <td class="metric best">1.77</td>
+            <td class="metric">0.88</td>
+            <td class="metric">0.3307</td>
+            <td class="metric best">1.56</td>
+            <td class="metric">0.95</td>
+            <td class="metric">0.4705</td>
+            <td class="metric">0.70</td>
+            <td class="metric">0.81</td>
+            <td class="metric">0.5188</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">466.82</td>
+            <td class="metric">0.77</td>
+            <td class="metric best">0</td>
+            <td class="metric">1.79</td>
+            <td class="metric">0.87</td>
+            <td class="metric">0.3275</td>
+            <td class="metric">1.64</td>
+            <td class="metric">0.94</td>
+            <td class="metric">0.6603</td>
+            <td class="metric">0.71</td>
+            <td class="metric">0.82</td>
+            <td class="metric">0.4337</td>
+          </tr>
+          <tr>
+            <td class="model-name">Unet</td>
+            <td class="metric">498.46</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0</td>
+            <td class="metric">1.90</td>
+            <td class="metric best">0.92</td>
+            <td class="metric">0.3863</td>
+            <td class="metric">1.63</td>
+            <td class="metric best">0.97</td>
+            <td class="metric">0.2065</td>
+            <td class="metric">0.74</td>
+            <td class="metric">0.85</td>
+            <td class="metric">0.0809</td>
+          </tr>
+          <tr>
+            <td class="model-name">Climatology</td>
+            <td class="metric">475.58</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">2.00</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">1.61</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">0.76</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div id="weeks56" class="tab-content">
+        <table>
+          <!-- Same structure as above but with weeks 5-6 data -->
+          <tr>
+            <th rowspan="2">Model</th>
+            <th colspan="3">Z500</th>
+            <th colspan="3">T850</th>
+            <th colspan="3">T2m</th>
+            <th colspan="3">Q700</th>
+          </tr>
+          <tr>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+            <th class="sortable">RMSE ↓</th>
+            <th class="sortable">ACC ↑</th>
+            <th class="sortable">Spec ↓</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric">471.58</td>
+            <td class="metric">0.81</td>
+            <td class="metric best">0</td>
+            <td class="metric">1.84</td>
+            <td class="metric">0.90</td>
+            <td class="metric best">0.2894</td>
+            <td class="metric">1.73</td>
+            <td class="metric best">0.95</td>
+            <td class="metric best">0.1805</td>
+            <td class="metric best">0.70</td>
+            <td class="metric">0.84</td>
+            <td class="metric best">0.0903</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric">469.92</td>
+            <td class="metric">0.81</td>
+            <td class="metric best">0</td>
+            <td class="metric best">1.80</td>
+            <td class="metric">0.90</td>
+            <td class="metric">0.3180</td>
+            <td class="metric">1.70</td>
+            <td class="metric">0.94</td>
+            <td class="metric">0.2093</td>
+            <td class="metric">0.71</td>
+            <td class="metric">0.84</td>
+            <td class="metric">0.0937</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric best">467.37</td>
+            <td class="metric">0.77</td>
+            <td class="metric best">0</td>
+            <td class="metric">1.81</td>
+            <td class="metric">0.87</td>
+            <td class="metric">0.4161</td>
+            <td class="metric">1.69</td>
+            <td class="metric">0.94</td>
+            <td class="metric">0.5971</td>
+            <td class="metric">0.72</td>
+            <td class="metric">0.81</td>
+            <td class="metric">0.7513</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">475.06</td>
+            <td class="metric">0.77</td>
+            <td class="metric best">0</td>
+            <td class="metric">1.84</td>
+            <td class="metric">0.87</td>
+            <td class="metric">0.3024</td>
+            <td class="metric">1.75</td>
+            <td class="metric">0.93</td>
+            <td class="metric">0.6105</td>
+            <td class="metric">0.72</td>
+            <td class="metric">0.82</td>
+            <td class="metric">0.3468</td>
+          </tr>
+          <tr>
+            <td class="model-name">Unet</td>
+            <td class="metric">521.32</td>
+            <td class="metric best">0.84</td>
+            <td class="metric best">0</td>
+            <td class="metric">2.09</td>
+            <td class="metric best">0.91</td>
+            <td class="metric">0.5110</td>
+            <td class="metric">2.29</td>
+            <td class="metric">0.93</td>
+            <td class="metric">0.4647</td>
+            <td class="metric">0.75</td>
+            <td class="metric best">0.85</td>
+            <td class="metric">0.8157</td>
+          </tr>
+          <tr>
+            <td class="model-name">Climatology</td>
+            <td class="metric">475.58</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">2.00</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric best">1.61</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+            <td class="metric">0.76</td>
+            <td class="metric">-</td>
+            <td class="metric">-</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- <div class="section">
+      <div class="section-header">Downscaling Performance</div>
+      <table>
+        <tr>
+          <th>Model</th>
+          <th>Z500 (RMSE ↓)</th>
+          <th>T850 (RMSE ↓)</th>
+          <th>T2m (RMSE ↓)</th>
+          <th>Q700 (RMSE ↓)</th>
+          <th>U10m (RMSE ↓)</th>
+          <th>V10m (RMSE ↓)</th>
+        </tr>
+        <tr>
+          <td class="model-name">Stormer finetuned</td>
+          <td class="metric best">38.84</td>
+          <td class="metric best">0.57</td>
+          <td class="metric best">0.62</td>
+          <td class="metric best">0.55</td>
+          <td class="metric best">0.64</td>
+          <td class="metric best">0.64</td>
+        </tr>
+        <tr>
+          <td class="model-name">Unet</td>
+          <td class="metric">47.65</td>
+          <td class="metric">0.66</td>
+          <td class="metric">0.73</td>
+          <td class="metric">0.56</td>
+          <td class="metric">0.70</td>
+          <td class="metric">0.70</td>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX finetuned</td>
+          <td class="metric">74.62</td>
+          <td class="metric">0.78</td>
+          <td class="metric">0.94</td>
+          <td class="metric">0.61</td>
+          <td class="metric">0.83</td>
+          <td class="metric">0.83</td>
+        </tr>
+      </table>
+    </div> -->
+
+    <div class="section">
+      <div class="section-header">Downscaling Performance</div>
+      <table>
+        <tr>
+          <th>Model</th>
+          <th colspan="2">Z500</th>
+          <th colspan="2">T850</th>
+          <th colspan="2">T2m</th>
+          <th colspan="2">Q700</th>
+          <th colspan="2">U10m</th>
+          <th colspan="2">V10m</th>
+        </tr>
+        <tr>
+          <th></th>
+          <th class="sortable">RMSE ↓</th>
+          <th class="sortable">Bias ↓</th>
+          <th class="sortable">RMSE ↓</th>
+          <th class="sortable">Bias ↓</th>
+          <th class="sortable">RMSE ↓</th>
+          <th class="sortable">Bias ↓</th>
+          <th class="sortable">RMSE ↓</th>
+          <th class="sortable">Bias ↓</th>
+          <th class="sortable">RMSE ↓</th>
+          <th class="sortable">Bias ↓</th>
+          <th class="sortable">RMSE ↓</th>
+          <th class="sortable">Bias ↓</th>
+        </tr>
+        <tr>
+          <td class="model-name">Stormer finetuned</td>
+          <td class="metric best">38.84</td>
+          <td class="metric best">0.090</td>
+          <td class="metric best">0.57</td>
+          <td class="metric">0.051</td>
+          <td class="metric best">0.62</td>
+          <td class="metric best">0.031</td>
+          <td class="metric best">0.55</td>
+          <td class="metric best">0.001</td>
+          <td class="metric best">0.64</td>
+          <td class="metric">0.011</td>
+          <td class="metric best">0.64</td>
+          <td class="metric">0.017</td>
+        </tr>
+        <tr>
+          <td class="model-name">Unet</td>
+          <td class="metric">47.65</td>
+          <td class="metric">8.790</td>
+          <td class="metric">0.66</td>
+          <td class="metric">0.140</td>
+          <td class="metric">0.73</td>
+          <td class="metric">0.040</td>
+          <td class="metric">0.56</td>
+          <td class="metric">0.005</td>
+          <td class="metric">0.70</td>
+          <td class="metric">0.011</td>
+          <td class="metric">0.70</td>
+          <td class="metric">0.006</td>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX finetuned</td>
+          <td class="metric">74.62</td>
+          <td class="metric">13.830</td>
+          <td class="metric">0.78</td>
+          <td class="metric">0.153</td>
+          <td class="metric">0.94</td>
+          <td class="metric">0.119</td>
+          <td class="metric">0.61</td>
+          <td class="metric">0.002</td>
+          <td class="metric">0.83</td>
+          <td class="metric best">0.007</td>
+          <td class="metric">0.83</td>
+          <td class="metric best">0.001</td>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX frozen</td>
+          <td class="metric">105.49</td>
+          <td class="metric">28.660</td>
+          <td class="metric">0.93</td>
+          <td class="metric">0.167</td>
+          <td class="metric">1.16</td>
+          <td class="metric">0.054</td>
+          <td class="metric">0.70</td>
+          <td class="metric best">0.001</td>
+          <td class="metric">1.02</td>
+          <td class="metric">0.032</td>
+          <td class="metric">1.01</td>
+          <td class="metric">0.009</td>
+        </tr>
+        <tr>
+          <td class="model-name">Stormer frozen</td>
+          <td class="metric">104.26</td>
+          <td class="metric">17.540</td>
+          <td class="metric">0.95</td>
+          <td class="metric best">0.046</td>
+          <td class="metric">1.12</td>
+          <td class="metric">0.048</td>
+          <td class="metric">0.76</td>
+          <td class="metric best">0.001</td>
+          <td class="metric">1.07</td>
+          <td class="metric">0.019</td>
+          <td class="metric">1.05</td>
+          <td class="metric">0.011</td>
+        </tr>
+      </table>
+    </div>
+    
+    <!-- <div class="section">
+      <div class="section-header">Climate Projection (NRMSE)</div>
+      <table>
+        <tr>
+          <th>Model</th>
+          <th>Surface Temperature (NRMSE_s ↓)</th>
+          <th>Diurnal Range (NRMSE_s ↓)</th>
+          <th>Precipitation (NRMSE_s ↓)</th>
+          <th>90th Percentile Precip (NRMSE_s ↓)</th>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX frozen</td>
+          <td class="metric best">0.085</td>
+          <td class="metric best">6.688</td>
+          <td class="metric best">2.193</td>
+          <td class="metric best">2.681</td>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX finetuned</td>
+          <td class="metric">0.086</td>
+          <td class="metric">7.148</td>
+          <td class="metric">2.360</td>
+          <td class="metric">2.739</td>
+        </tr>
+        <tr>
+          <td class="model-name">Stormer frozen</td>
+          <td class="metric">0.117</td>
+          <td class="metric">9.123</td>
+          <td class="metric">6.159</td>
+          <td class="metric">6.773</td>
+        </tr>
+        <tr>
+          <td class="model-name">Stormer finetuned</td>
+          <td class="metric">0.126</td>
+          <td class="metric">8.598</td>
+          <td class="metric">6.180</td>
+          <td class="metric">6.797</td>
+        </tr>
+      </table>
+    </div> -->
+
+    <div class="section">
+      <div class="section-header">Climate Model Emulation</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchEmulationTab('temp')">Surface Air Temperature</div>
+        <div class="tab" onclick="switchEmulationTab('diurnal')">Diurnal Temperature Range</div>
+        <div class="tab" onclick="switchEmulationTab('precip')">Precipitation</div>
+        <div class="tab" onclick="switchEmulationTab('precip90')">90th Percentile Precipitation</div>
+      </div>
+      
+      <div id="temp" class="tab-content active">
+        <table>
+          <tr>
+            <th>Model</th>
+            <th class="sortable">NRMSE_s ↓</th>
+            <th class="sortable">NRMSE_g ↓</th>
+            <th class="sortable">NRMSE_t ↓</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric best">0.085</td>
+            <td class="metric best">0.043</td>
+            <td class="metric best">0.297</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric">0.086</td>
+            <td class="metric best">0.043</td>
+            <td class="metric">0.300</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric">0.117</td>
+            <td class="metric best">0.043</td>
+            <td class="metric">0.334</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">0.126</td>
+            <td class="metric">0.047</td>
+            <td class="metric">0.361</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimateBench-NN</td>
+            <td class="metric">0.123</td>
+            <td class="metric">0.080</td>
+            <td class="metric">0.524</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div id="diurnal" class="tab-content">
+        <table>
+          <tr>
+            <th>Model</th>
+            <th>NRMSE_s ↓</th>
+            <th>NRMSE_g ↓</th>
+            <th>NRMSE_t ↓</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric best">6.688</td>
+            <td class="metric best">0.810</td>
+            <td class="metric best">10.739</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric">7.148</td>
+            <td class="metric">0.961</td>
+            <td class="metric">11.952</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric">9.123</td>
+            <td class="metric">0.980</td>
+            <td class="metric">14.022</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">8.598</td>
+            <td class="metric">0.834</td>
+            <td class="metric">12.767</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimateBench-NN</td>
+            <td class="metric">7.465</td>
+            <td class="metric">1.233</td>
+            <td class="metric">13.632</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div id="precip" class="tab-content">
+        <table>
+          <tr>
+            <th>Model</th>
+            <th>NRMSE_s ↓</th>
+            <th>NRMSE_g ↓</th>
+            <th>NRMSE_t ↓</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric best">2.193</td>
+            <td class="metric">0.183</td>
+            <td class="metric">3.110</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric">2.360</td>
+            <td class="metric">0.206</td>
+            <td class="metric">3.390</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric">6.159</td>
+            <td class="metric">0.210</td>
+            <td class="metric">7.211</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">6.180</td>
+            <td class="metric">0.391</td>
+            <td class="metric">8.136</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimateBench-NN</td>
+            <td class="metric">2.349</td>
+            <td class="metric best">0.151</td>
+            <td class="metric best">3.104</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div id="precip90" class="tab-content">
+        <table>
+          <tr>
+            <th>Model</th>
+            <th>NRMSE_s ↓</th>
+            <th>NRMSE_g ↓</th>
+            <th>NRMSE_t ↓</th>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX frozen</td>
+            <td class="metric best">2.681</td>
+            <td class="metric">0.342</td>
+            <td class="metric best">4.389</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimaX finetuned</td>
+            <td class="metric">2.739</td>
+            <td class="metric">0.332</td>
+            <td class="metric">4.397</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer frozen</td>
+            <td class="metric">6.773</td>
+            <td class="metric">0.296</td>
+            <td class="metric">8.254</td>
+          </tr>
+          <tr>
+            <td class="model-name">Stormer finetuned</td>
+            <td class="metric">6.797</td>
+            <td class="metric">0.316</td>
+            <td class="metric">8.376</td>
+          </tr>
+          <tr>
+            <td class="model-name">ClimateBench-NN</td>
+            <td class="metric">3.108</td>
+            <td class="metric best">0.282</td>
+            <td class="metric">4.517</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Event Detection</div>
+      <table>
+        <tr>
+          <th>Model</th>
+          <th class="sortable">TC Detection (Specificity ↑)</th>
+          <th class="sortable">AR Detection (Specificity ↑)</th>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX frozen</td>
+          <td class="metric best">0.99</td>
+          <td class="metric best">0.96</td>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX finetuned</td>
+          <td class="metric best">0.99</td>
+          <td class="metric best">0.96</td>
+        </tr>
+        <tr>
+          <td class="model-name">Stormer frozen</td>
+          <td class="metric">0.98</td>
+          <td class="metric">0.95</td>
+        </tr>
+        <tr>
+          <td class="model-name">Stormer finetuned</td>
+          <td class="metric">0.98</td>
+          <td class="metric">0.95</td>
+        </tr>
+        <tr>
+          <td class="model-name">CGNet</td>
+          <td class="metric best">0.99</td>
+          <td class="metric">0.92</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-header">Near-Surface Pollutants Downscaling (MAE)</div>
+      <table>
+        <tr>
+          <th class="sortable">Model</th>
+          <th class="sortable">NO2 ↓</th>
+          <th class="sortable">SO2 ↓</th>
+          <th class="sortable">CO ↓</th>
+          <th class="sortable">O3 ↓</th>
+          <th class="sortable">PM2.5 ↓</th>
+        </tr>
+        <tr>
+          <td class="model-name">ClimaX finetuned</td>
+          <td class="metric">0.069</td>
+          <td class="metric">0.049</td>
+          <td class="metric">0.405</td>
+          <td class="metric best">0.0065</td>
+          <td class="metric best">0.100</td>
+        </tr>
+        <tr>
+          <td class="model-name">Unet</td>
+          <td class="metric best">0.064</td>
+          <td class="metric best">0.047</td>
+          <td class="metric">-</td>
+          <td class="metric">0.0071</td>
+          <td class="metric">0.104</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+<script>
+  function switchTab(tabId) {
+    // Remove active class from all tabs and contents
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    // Add active class to selected tab and content
+    document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  function switchEmulationTab(tabId) {
+    // Remove active class from all emulation tabs and contents
+    document.querySelectorAll('.section:has(.tab[onclick*="switchEmulationTab"]) .tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('#temp, #diurnal, #precip, #precip90').forEach(content => content.classList.remove('active'));
+    
+    // Add active class to selected tab and content
+    document.querySelector(`.tab[onclick="switchEmulationTab('${tabId}')"]`).classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  function sortTable(table, column, asc = true) {
+    const dirModifier = asc ? 1 : -1;
+    const rows = Array.from(table.querySelectorAll('tr:not(:first-child)'));
+    const headers = table.querySelectorAll('th');
+    
+    // Reset all headers
+    headers.forEach(header => {
+      header.classList.remove('sort-asc', 'sort-desc');
+    });
+    
+    // Add sort indicator to current header
+    headers[column].classList.add(asc ? 'sort-asc' : 'sort-desc');
+  
+    // Sort rows
+    const sortedRows = rows.sort((a, b) => {
+      const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+      const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+      
+      // Handle special cases
+      if (aColText === '-') return 1;
+      if (bColText === '-') return -1;
+      
+      // Convert to numbers if possible
+      const aValue = isNaN(parseFloat(aColText)) ? aColText : parseFloat(aColText);
+      const bValue = isNaN(parseFloat(bColText)) ? bColText : parseFloat(bColText);
+      
+      return aValue > bValue ? (1 * dirModifier) : (-1 * dirModifier);
+    });
+  
+    // Remove existing rows
+    rows.forEach(row => row.remove());
+    
+    // Add sorted rows
+    sortedRows.forEach(row => table.appendChild(row));
+  }
+  
+  function initSortableTables() {
+    document.querySelectorAll('table').forEach(table => {
+      const headerRow = table.querySelector('tr');
+      if (!headerRow) return;
+      
+      const headers = headerRow.querySelectorAll('th');
+      headers.forEach((header, index) => {
+        // Skip if it's a grouped header (colspan > 1)
+        if (header.getAttribute('colspan') > 1 || header.getAttribute('rowspan') > 1) return;
+        // Skip first column (model names)
+        if (index === 0) return;
+        
+        header.classList.add('sortable');
+        let asc = true;
+        header.addEventListener('click', () => {
+          sortTable(table, index, asc);
+          asc = !asc;
+        });
+      });
+    });
+  }
+  
+  // Initialize sorting when page loads
+  document.addEventListener('DOMContentLoaded', initSortableTables);
+  
+  // Re-initialize sorting when switching tabs
+  const originalSwitchTab = window.switchTab;
+  window.switchTab = function(tabId) {
+    originalSwitchTab(tabId);
+    initSortableTables();
+  };
+  
+  const originalSwitchEmulationTab = window.switchEmulationTab;
+  window.switchEmulationTab = function(tabId) {
+    originalSwitchEmulationTab(tabId);
+    initSortableTables();
+  };
+
+</script>
+</body>
+</html>
